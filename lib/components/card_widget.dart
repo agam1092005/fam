@@ -1,284 +1,366 @@
+import 'dart:math';
+import 'package:fam/components/card_components.dart';
 import 'package:flutter/material.dart';
+import '../utils/helper.dart';
 
-Widget buildDynamicContainer(Map<String, dynamic> json) {
-  switch (json['design_type']) {
-    case 'HC1':
-      return Container(
-        height: double.parse(json['height'].toString()),
-        width: double.maxFinite,
-        decoration: BoxDecoration(
-          color: (json['cards'][0].containsKey("bg_color"))
-              ? Color(
-                  int.parse(
-                    "0xFF${json['cards'][0]['bg_color'].toString().substring(1)}",
+class DynamicContainer extends StatefulWidget {
+  final Map<String, dynamic> json;
+  const DynamicContainer({super.key, required this.json});
+
+  @override
+  State<DynamicContainer> createState() => _DynamicContainerState();
+}
+
+class _DynamicContainerState extends State<DynamicContainer> {
+  Map<int, bool> _isSlidingMap = {};
+  @override
+  Widget build(BuildContext context) {
+    switch (widget.json['design_type']) {
+      case 'HC1':
+        return SizedBox(
+          height: double.parse(widget.json['height'].toString()),
+          width: double.maxFinite,
+          child: ListView.builder(
+            itemCount: widget.json['cards'].length,
+            scrollDirection: Axis.horizontal,
+            itemBuilder: (BuildContext context, int index) {
+              return Container(
+                width: (MediaQuery.of(context).size.width) /
+                    min(widget.json['cards'].length, 2),
+                margin: getMargin(widget.json['cards'][index]),
+                decoration: BoxDecoration(
+                  color: getBackgroundColor(widget.json['cards'][index]),
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(12),
                   ),
-                )
-              : Colors.transparent,
-          borderRadius: BorderRadius.all(
-            Radius.circular(12),
+                ),
+                child: Align(
+                  alignment: Alignment.center,
+                  child: ListTile(
+                    leading: (widget.json['cards'][index].containsKey("icon"))
+                        ? Image(
+                            image: NetworkImage(
+                              widget.json['cards'][index]['icon']['image_url'],
+                            ),
+                            width: (widget.json['cards'][index]
+                                    .containsKey("icon_size"))
+                                ? double.parse(widget.json['cards'][index]
+                                        ['icon_size']
+                                    .toString())
+                                : 35,
+                          )
+                        : null,
+                    title: Text(widget.json['cards'][index]['title'] ?? ''),
+                    subtitle:
+                        Text(widget.json['cards'][index]['description'] ?? ''),
+                  ),
+                ),
+              );
+            },
           ),
-        ),
-        child: Align(
-          alignment: Alignment.center,
-          child: ListTile(
-            leading: (json['cards'][0].containsKey("icon"))
-                ? Image(
-                    image: NetworkImage(
-                      json['cards'][0]['icon']['image_url'],
-                    ),
-                    width: (json['cards'][0].containsKey("icon_size"))
-                        ? double.parse(json['cards'][0]['icon_size'].toString())
-                        : 35,
-                  )
-                : null,
-            title: Text(json['cards'][0]['title']),
-          ),
-        ),
-      );
-    case 'HC3':
-      return Container(
-        height: double.parse(json['height'].toString()),
-        width: double.maxFinite,
-        decoration: BoxDecoration(
-          color: (json['cards'][0].containsKey("bg_color"))
-              ? Color(
-                  int.parse(
-                    "0xFF${json['cards'][0]['bg_color'].toString().substring(1)}",
-                  ),
-                )
-              : Colors.transparent,
-          borderRadius: BorderRadius.all(
-            Radius.circular(12),
-          ),
-        ),
-        child: Stack(
-          alignment: Alignment.topLeft,
-          children: [
-            (json['cards'][0].containsKey('bg_image'))
-                ? Positioned.fill(
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.all(Radius.circular(12)),
-                      child: Image.network(
-                        json['cards'][0]['bg_image']['image_url'],
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  )
-                : SizedBox(
-                    height: 0,
-                  ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 40),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    json['cards'][0]['title'],
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  (json['cards'][0].containsKey('cta'))
-                      ? TextButton(
-                          onPressed: () {},
-                          style: TextButton.styleFrom(
-                            backgroundColor: Color(int.parse(
-                                "0xFF${json['cards'][0]['cta'][0]['bg_color'].toString().substring(1)}")),
-                          ),
-                          child: Text(json['cards'][0]['cta'][0]['text']),
-                        )
-                      : SizedBox(
-                          height: 0,
-                        ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      );
-    case 'HC5':
-      return Container(
-        width: double.maxFinite,
-        decoration: BoxDecoration(
-          color: (json['cards'][0].containsKey("bg_color"))
-              ? Color(
-                  int.parse(
-                    "0xFF${json['cards'][0]['bg_color'].toString().substring(1)}",
-                  ),
-                )
-              : Colors.transparent,
-          borderRadius: BorderRadius.all(
-            Radius.circular(12),
-          ),
-        ),
-        child: Stack(
-          alignment: Alignment.topLeft,
-          children: [
-            (json['cards'][0].containsKey('bg_image'))
-                ? Image(
-                    image: NetworkImage(
-                      json['cards'][0]['bg_image']['image_url'],
-                    ),
-                  )
-                : SizedBox(
-                    height: 0,
-                  ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 40),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    json['cards'][0]['title'],
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  (json['cards'][0].containsKey('cta'))
-                      ? TextButton(
-                          onPressed: () {},
-                          style: TextButton.styleFrom(
-                            backgroundColor: Color(
-                              int.parse(
-                                "0xFF${json['cards'][0]['cta'][0]['bg_color'].toString().substring(1)}",
-                              ),
+        );
+      case 'HC3':
+        return SizedBox(
+          height: double.parse(widget.json['height'].toString()),
+          width: double.maxFinite,
+          child: ListView.builder(
+            itemCount: widget.json['cards'].length,
+            scrollDirection: Axis.horizontal,
+            itemBuilder: (BuildContext context, int index) {
+              _isSlidingMap.putIfAbsent(index, () => false);
+              return GestureDetector(
+                onLongPress: () {
+                  setState(() {
+                    _isSlidingMap[index] = true;
+                  });
+                },
+                onTap: () {
+                  setState(() {
+                    _isSlidingMap[index] = false;
+                  });
+                },
+                child: Stack(
+                  children: [
+                    if (_isSlidingMap[index]!)
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              // Handle "Remind Later" action
+                              print('Remind Later Pressed');
+                              setState(() {
+                                _isSlidingMap[index] = false;
+                              });
+                            },
+                            child: Column(
+                              children: [
+                                Icon(Icons.notifications, color: Colors.orange),
+                                Text('Remind Later'),
+                              ],
                             ),
                           ),
-                          child: Text(json['cards'][0]['cta'][0]['text']),
-                        )
-                      : SizedBox(
-                          height: 0,
-                        ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      );
-    case 'HC6':
-      return Container(
-        height: double.parse(json['height'].toString()),
-        width: double.maxFinite,
-        decoration: BoxDecoration(
-          color: (json['cards'][0].containsKey("bg_color"))
-              ? Color(
-                  int.parse(
-                    "0xFF${json['cards'][0]['bg_color'].toString().substring(1)}",
-                  ),
-                )
-              : Colors.transparent,
-          borderRadius: BorderRadius.all(
-            Radius.circular(12),
-          ),
-        ),
-        child: Align(
-          alignment: Alignment.center,
-          child: ListTile(
-            trailing: Icon(
-              Icons.arrow_forward_ios,
-              size: (json['cards'][0].containsKey("icon_size"))
-                  ? double.parse(json['cards'][0]['icon_size'].toString())
-                  : 35,
-            ),
-            leading: (json['cards'][0].containsKey("icon"))
-                ? Image(
-                    image: NetworkImage(
-                      json['cards'][0]['icon']['image_url'],
-                    ),
-                    width: (json['cards'][0].containsKey("icon_size"))
-                        ? double.parse(json['cards'][0]['icon_size'].toString())
-                        : 35,
-                  )
-                : null,
-            title: Text(json['cards'][0]['title']),
-          ),
-        ),
-      );
-    case 'HC9':
-      return Container(
-        height: double.parse(json['height'].toString()),
-        decoration: BoxDecoration(
-          color: (json['cards'][0].containsKey("bg_color"))
-              ? Color(
-                  int.parse(
-                    "0xFF${json['cards'][0]['bg_color'].toString().substring(1)}",
-                  ),
-                )
-              : Colors.transparent,
-          borderRadius: BorderRadius.all(
-            Radius.circular(12),
-          ),
-        ),
-        child: Stack(
-          alignment: Alignment.topLeft,
-          children: [
-            (json['cards'][0].containsKey('bg_image'))
-                ? Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors:
-                            (json['cards'][0]['bg_gradient']['colors'] as List)
-                                .map((hex) {
-                          if (hex is String) {
-                            final colorValue =
-                                int.parse(hex.substring(1), radix: 16);
-                            return Color(0xFF000000 | colorValue);
-                          } else {
-                            throw FormatException(
-                                'Expected hex string, but got ${hex.runtimeType}');
-                          }
-                        }).toList(),
-                        begin: Alignment(-1.0, 0.0),
-                        end: Alignment(1.0, 0.0),
-                        transform: GradientRotation(
-                          double.parse(
-                            json['cards'][0]['bg_gradient']['angle'].toString(),
+                          GestureDetector(
+                            onTap: () {
+                              // Handle "Dismiss Now" action
+                              print('Dismiss Now Pressed');
+                              setState(() {
+                                _isSlidingMap[index] = false;
+                              });
+                            },
+                            child: Column(
+                              children: [
+                                Icon(Icons.cancel, color: Colors.red),
+                                Text('Dismiss Now'),
+                              ],
+                            ),
                           ),
+                        ],
+                      ),
+                    AnimatedContainer(
+                      duration: Duration(milliseconds: 200),
+                      transform: _isSlidingMap[index]!
+                          ? Matrix4.translationValues(
+                              150, 0, 0) // Slide to the left
+                          : Matrix4.translationValues(
+                              0, 0, 0), // Original position
+                      margin: getMargin(widget.json['cards'][index]),
+                      width: MediaQuery.of(context).size.width - 48,
+                      decoration: BoxDecoration(
+                        color: getBackgroundColor(widget.json['cards'][index]),
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(12),
                         ),
                       ),
+                      child: Stack(
+                        alignment: Alignment.topLeft,
+                        children: [
+                          (widget.json['cards'][index].containsKey('bg_image'))
+                              ? Positioned.fill(
+                                  child: ClipRRect(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(12)),
+                                    child: Image.network(
+                                      widget.json['cards'][index]['bg_image']
+                                          ['image_url'],
+                                      fit: BoxFit.cover,
+                                      alignment: Alignment.topLeft,
+                                    ),
+                                  ),
+                                )
+                              : SizedBox(
+                                  height: 0,
+                                ),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 40),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                    widget.json['cards'][index]['title'] ?? ''),
+                                SizedBox(
+                                  height: 20,
+                                ),
+                                (widget.json['cards'][index].containsKey('cta'))
+                                    ? TextButton(
+                                        onPressed: () {},
+                                        style: TextButton.styleFrom(
+                                          backgroundColor: Color(int.parse(
+                                              "0xFF${widget.json['cards'][index]['cta'][0]['bg_color'].toString().substring(1)}")),
+                                        ),
+                                        child: Text(widget.json['cards'][index]
+                                            ['cta'][0]['text']),
+                                      )
+                                    : SizedBox(
+                                        height: 0,
+                                      ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        );
+      case 'HC5':
+        return FutureBuilder<double>(
+          future: getImageHeight(
+              widget.json['cards'][0]['bg_image']['image_url'],
+              MediaQuery.of(context).size.width - 48),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return CircularProgressIndicator();
+            }
+
+            double h = snapshot.data ?? 100;
+            return SizedBox(
+              height: h,
+              width: double.maxFinite,
+              child: ListView.builder(
+                itemCount: widget.json['cards'].length,
+                scrollDirection: Axis.horizontal,
+                itemBuilder: (BuildContext context, int index) {
+                  return Container(
+                    margin: getMargin(widget.json['cards'][index]),
+                    width: MediaQuery.of(context).size.width - 48,
+                    decoration: BoxDecoration(
+                      color: getBackgroundColor(widget.json['cards'][index]),
                       borderRadius: BorderRadius.all(
                         Radius.circular(12),
                       ),
                     ),
-                    child: Image(
-                      image: NetworkImage(
-                        json['cards'][0]['bg_image']['image_url'],
+                    child: Stack(
+                      alignment: Alignment.topLeft,
+                      children: [
+                        (widget.json['cards'][index].containsKey('bg_image'))
+                            ? AspectRatio(
+                                aspectRatio: 2.4,
+                                child: Image.network(
+                                  widget.json['cards'][index]['bg_image']
+                                      ['image_url'],
+                                ),
+                              )
+                            : SizedBox(
+                                height: 0,
+                              ),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 40),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(widget.json['cards'][index]['title'] ?? ''),
+                              SizedBox(
+                                height: 20,
+                              ),
+                              (widget.json['cards'][index].containsKey('cta'))
+                                  ? TextButton(
+                                      onPressed: () {},
+                                      style: TextButton.styleFrom(
+                                        backgroundColor: Color(int.parse(
+                                            "0xFF${widget.json['cards'][index]['cta'][0]['bg_color'].toString().substring(1)}")),
+                                      ),
+                                      child: Text(widget.json['cards'][index]
+                                          ['cta'][0]['text']),
+                                    )
+                                  : SizedBox(
+                                      height: 0,
+                                    ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            );
+          },
+        );
+      case 'HC6':
+        return SizedBox(
+          height: double.parse(widget.json['height'].toString()),
+          width: double.maxFinite,
+          child: ListView.builder(
+            itemCount: widget.json['cards'].length,
+            scrollDirection: Axis.horizontal,
+            itemBuilder: (BuildContext context, int index) {
+              return Container(
+                width: (MediaQuery.of(context).size.width - 48) /
+                    min(widget.json['cards'].length, 2),
+                margin: getMargin(widget.json['cards'][index]),
+                decoration: BoxDecoration(
+                  color: getBackgroundColor(widget.json['cards'][index]),
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(12),
+                  ),
+                ),
+                child: Align(
+                  alignment: Alignment.center,
+                  child: ListTile(
+                    trailing: Icon(
+                      Icons.arrow_forward_ios,
+                      size:
+                          (widget.json['cards'][index].containsKey("icon_size"))
+                              ? double.parse(widget.json['cards'][index]
+                                      ['icon_size']
+                                  .toString())
+                              : 35,
+                    ),
+                    leading: (widget.json['cards'][index].containsKey("icon"))
+                        ? Image(
+                            image: NetworkImage(
+                              widget.json['cards'][index]['icon']['image_url'],
+                            ),
+                            width: (widget.json['cards'][index]
+                                    .containsKey("icon_size"))
+                                ? double.parse(widget.json['cards'][index]
+                                        ['icon_size']
+                                    .toString())
+                                : 35,
+                          )
+                        : null,
+                    title: Text(widget.json['cards'][index]['title'] ?? ''),
+                    subtitle:
+                        Text(widget.json['cards'][index]['description'] ?? ''),
+                  ),
+                ),
+              );
+            },
+          ),
+        );
+      case 'HC9':
+        return SizedBox(
+          height: double.parse(widget.json['height'].toString()),
+          child: ListView.builder(
+            itemCount: widget.json['cards'].length,
+            scrollDirection: Axis.horizontal,
+            itemBuilder: (BuildContext context, int index) {
+              return Container(
+                margin: EdgeInsets.symmetric(horizontal: 8),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: (widget.json['cards'][index]['bg_gradient']
+                            ['colors'] as List)
+                        .map((hex) {
+                      if (hex is String) {
+                        final colorValue =
+                            int.parse(hex.substring(1), radix: 16);
+                        return Color(0xFF000000 | colorValue);
+                      } else {
+                        throw FormatException(
+                            'Expected hex string, but got ${hex.runtimeType}');
+                      }
+                    }).toList(),
+                    begin: Alignment(-1.0, 0.0),
+                    end: Alignment(1.0, 0.0),
+                    transform: GradientRotation(
+                      double.parse(
+                        widget.json['cards'][index]['bg_gradient']['angle']
+                            .toString(),
                       ),
                     ),
-                  )
-                : SizedBox(
-                    height: 0,
                   ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 40),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  (json['cards'][0].containsKey('cta'))
-                      ? TextButton(
-                          onPressed: () {},
-                          style: TextButton.styleFrom(
-                            backgroundColor: Color(
-                              int.parse(
-                                "0xFF${json['cards'][0]['cta'][0]['bg_color'].toString().substring(1)}",
-                              ),
-                            ),
-                          ),
-                          child: Text(json['cards'][0]['cta'][0]['text']),
-                        )
-                      : SizedBox(
-                          height: 0,
-                        ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      );
-    default:
-      return Container();
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(12),
+                  ),
+                ),
+                child: Image(
+                  image: NetworkImage(
+                    widget.json['cards'][index]['bg_image']['image_url'],
+                  ),
+                ),
+              );
+            },
+          ),
+        );
+      default:
+        return Container();
+    }
   }
 }

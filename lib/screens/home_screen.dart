@@ -25,16 +25,21 @@ class HomeScreen extends StatelessWidget {
       ),
       body: cardProvider.cardGroups.isEmpty
           ? Center(child: CircularProgressIndicator())
-          : ListView.builder(
-              scrollDirection: Axis.vertical,
-              padding: Constants.defaultPadding,
-              itemCount: cardProvider.cardGroups.length,
-              itemBuilder: (ctx, index) {
-                return Padding(
-                  padding: EdgeInsets.symmetric(vertical: 16),
-                  child: buildDynamicContainer(cardProvider.cardGroups[index]),
-                );
-              },
+          : RefreshIndicator(
+              child: ListView.builder(
+                scrollDirection: Axis.vertical,
+                padding: Constants.defaultPadding,
+                itemCount: cardProvider.cardGroups.length,
+                itemBuilder: (ctx, index) {
+                  return Padding(
+                    padding: EdgeInsets.symmetric(vertical: 16),
+                    child: DynamicContainer(
+                      json: cardProvider.cardGroups[index],
+                    ),
+                  );
+                },
+              ),
+              onRefresh: () async {},
             ),
     );
   }
