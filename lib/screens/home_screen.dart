@@ -1,3 +1,4 @@
+import 'package:fam/components/card_widget.dart';
 import 'package:fam/utils/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -29,12 +30,9 @@ class HomeScreen extends StatelessWidget {
               padding: Constants.defaultPadding,
               itemCount: cardProvider.cardGroups.length,
               itemBuilder: (ctx, index) {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(cardProvider.cardGroups[index]['design_type']
-                        .toString()),
-                  ],
+                return Padding(
+                  padding: EdgeInsets.symmetric(vertical: 16),
+                  child: buildDynamicContainer(cardProvider.cardGroups[index]),
                 );
               },
             ),
