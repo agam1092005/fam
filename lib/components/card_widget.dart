@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:fam/components/card_components.dart';
 import 'package:fam/utils/constants.dart';
 import 'package:flutter/material.dart';
@@ -25,38 +24,20 @@ class _DynamicContainerState extends State<DynamicContainer> {
           child: ListView.builder(
             itemCount: widget.json['cards'].length,
             scrollDirection: Axis.horizontal,
-            physics: (widget.json['is_scrollable'])
-                ? ClampingScrollPhysics()
-                : NeverScrollableScrollPhysics(),
+            physics: getScrollable(widget.json),
             itemBuilder: (BuildContext context, int index) {
               return Container(
-                width: (widget.json['is_scrollable'])
-                    ? (MediaQuery.of(context).size.width / 2)
-                    : ((MediaQuery.of(context).size.width - 64) /
-                        widget.json['cards'].length),
+                width:
+                    getSmallCardWidth(widget.json, MediaQuery.of(context).size),
                 margin: getMargin(widget.json['cards'][index]),
                 decoration: BoxDecoration(
                   color: getBackgroundColor(widget.json['cards'][index]),
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(12),
-                  ),
+                  borderRadius: Constants.defaultBorderRadius,
                 ),
                 child: Align(
                   alignment: Alignment.center,
                   child: ListTile(
-                    leading: (widget.json['cards'][index].containsKey("icon"))
-                        ? Image(
-                            image: NetworkImage(
-                              widget.json['cards'][index]['icon']['image_url'],
-                            ),
-                            width: (widget.json['cards'][index]
-                                    .containsKey("icon_size"))
-                                ? double.parse(widget.json['cards'][index]
-                                        ['icon_size']
-                                    .toString())
-                                : 35,
-                          )
-                        : null,
+                    leading: getLeadingIcon(widget.json['cards'][index]),
                     title: Text(widget.json['cards'][index]['title'] ?? ''),
                     subtitle:
                         Text(widget.json['cards'][index]['description'] ?? ''),
@@ -73,9 +54,7 @@ class _DynamicContainerState extends State<DynamicContainer> {
           child: ListView.builder(
             itemCount: widget.json['cards'].length,
             scrollDirection: Axis.horizontal,
-            physics: (widget.json['is_scrollable'])
-                ? ClampingScrollPhysics()
-                : NeverScrollableScrollPhysics(),
+            physics: getScrollable(widget.json),
             itemBuilder: (BuildContext context, int index) {
               _isSlidingMap.putIfAbsent(index, () => false);
               return GestureDetector(
@@ -115,10 +94,9 @@ class _DynamicContainerState extends State<DynamicContainer> {
                                 });
                               },
                               child: Container(
-                                padding: EdgeInsets.all(16),
+                                padding: Constants.defaultPadding,
                                 decoration: BoxDecoration(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(12)),
+                                  borderRadius: Constants.defaultBorderRadius,
                                   color: Constants.bgColor,
                                 ),
                                 child: Column(
@@ -139,15 +117,14 @@ class _DynamicContainerState extends State<DynamicContainer> {
                                 });
                               },
                               child: Container(
-                                padding: EdgeInsets.all(16),
+                                padding: Constants.defaultPadding,
                                 decoration: BoxDecoration(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(12)),
+                                  borderRadius: Constants.defaultBorderRadius,
                                   color: Constants.bgColor,
                                 ),
                                 child: Column(
                                   children: [
-                                    Icon(Icons.cancel, color: Colors.red),
+                                    Icon(Icons.cancel, color: Colors.orange),
                                     Text('Dismiss Now'),
                                   ],
                                 ),
@@ -167,29 +144,12 @@ class _DynamicContainerState extends State<DynamicContainer> {
                       width: MediaQuery.of(context).size.width - 48,
                       decoration: BoxDecoration(
                         color: getBackgroundColor(widget.json['cards'][index]),
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(12),
-                        ),
+                        borderRadius: Constants.defaultBorderRadius,
                       ),
                       child: Stack(
                         alignment: Alignment.topLeft,
                         children: [
-                          (widget.json['cards'][index].containsKey('bg_image'))
-                              ? Positioned.fill(
-                                  child: ClipRRect(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(12)),
-                                    child: Image.network(
-                                      widget.json['cards'][index]['bg_image']
-                                          ['image_url'],
-                                      fit: BoxFit.cover,
-                                      alignment: Alignment.topLeft,
-                                    ),
-                                  ),
-                                )
-                              : SizedBox(
-                                  height: 0,
-                                ),
+                          getBgImage(widget.json['cards'][index]),
                           Padding(
                             padding: EdgeInsets.symmetric(horizontal: 40),
                             child: Column(
@@ -254,34 +214,19 @@ class _DynamicContainerState extends State<DynamicContainer> {
               child: ListView.builder(
                 itemCount: widget.json['cards'].length,
                 scrollDirection: Axis.horizontal,
-                physics: (widget.json['is_scrollable'])
-                    ? ClampingScrollPhysics()
-                    : NeverScrollableScrollPhysics(),
+                physics: getScrollable(widget.json),
                 itemBuilder: (BuildContext context, int index) {
                   return Container(
                     margin: getMargin(widget.json['cards'][index]),
                     width: MediaQuery.of(context).size.width - 48,
                     decoration: BoxDecoration(
                       color: getBackgroundColor(widget.json['cards'][index]),
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(12),
-                      ),
+                      borderRadius: Constants.defaultBorderRadius,
                     ),
                     child: Stack(
                       alignment: Alignment.topLeft,
                       children: [
-                        (widget.json['cards'][index].containsKey('bg_image'))
-                            ? AspectRatio(
-                                aspectRatio: widget.json['cards'][index]
-                                    ['bg_image']['aspect_ratio'],
-                                child: Image.network(
-                                  widget.json['cards'][index]['bg_image']
-                                      ['image_url'],
-                                ),
-                              )
-                            : SizedBox(
-                                height: 0,
-                              ),
+                        getBgImage(widget.json['cards'][index]),
                         Text(widget.json['cards'][index]['title'] ?? ''),
                       ],
                     ),
@@ -298,47 +243,21 @@ class _DynamicContainerState extends State<DynamicContainer> {
           child: ListView.builder(
             itemCount: widget.json['cards'].length,
             scrollDirection: Axis.horizontal,
-            physics: (widget.json['is_scrollable'])
-                ? ClampingScrollPhysics()
-                : NeverScrollableScrollPhysics(),
+            physics: getScrollable(widget.json),
             itemBuilder: (BuildContext context, int index) {
               return Container(
-                width: (widget.json['is_scrollable'])
-                    ? (MediaQuery.of(context).size.width / 2)
-                    : ((MediaQuery.of(context).size.width - 64) /
-                        widget.json['cards'].length),
+                width:
+                    getSmallCardWidth(widget.json, MediaQuery.of(context).size),
                 margin: getMargin(widget.json['cards'][index]),
                 decoration: BoxDecoration(
                   color: getBackgroundColor(widget.json['cards'][index]),
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(12),
-                  ),
+                  borderRadius: Constants.defaultBorderRadius,
                 ),
                 child: Align(
                   alignment: Alignment.center,
                   child: ListTile(
-                    trailing: Icon(
-                      Icons.arrow_forward_ios,
-                      size:
-                          (widget.json['cards'][index].containsKey("icon_size"))
-                              ? double.parse(widget.json['cards'][index]
-                                      ['icon_size']
-                                  .toString())
-                              : 35,
-                    ),
-                    leading: (widget.json['cards'][index].containsKey("icon"))
-                        ? Image(
-                            image: NetworkImage(
-                              widget.json['cards'][index]['icon']['image_url'],
-                            ),
-                            width: (widget.json['cards'][index]
-                                    .containsKey("icon_size"))
-                                ? double.parse(widget.json['cards'][index]
-                                        ['icon_size']
-                                    .toString())
-                                : 35,
-                          )
-                        : null,
+                    trailing: getTrailingArrow(widget.json['cards'][index]),
+                    leading: getLeadingIcon(widget.json['cards'][index]),
                     title: Text(widget.json['cards'][index]['title'] ?? ''),
                     subtitle:
                         Text(widget.json['cards'][index]['description'] ?? ''),
@@ -358,31 +277,8 @@ class _DynamicContainerState extends State<DynamicContainer> {
               return Container(
                 margin: EdgeInsets.symmetric(horizontal: 8),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: (widget.json['cards'][index]['bg_gradient']
-                            ['colors'] as List)
-                        .map((hex) {
-                      if (hex is String) {
-                        final colorValue =
-                            int.parse(hex.substring(1), radix: 16);
-                        return Color(0xFF000000 | colorValue);
-                      } else {
-                        throw FormatException(
-                            'Expected hex string, but got ${hex.runtimeType}');
-                      }
-                    }).toList(),
-                    begin: Alignment(-1.0, 0.0),
-                    end: Alignment(1.0, 0.0),
-                    transform: GradientRotation(
-                      double.parse(
-                        widget.json['cards'][index]['bg_gradient']['angle']
-                            .toString(),
-                      ),
-                    ),
-                  ),
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(12),
-                  ),
+                  gradient: getCardGradient(widget.json['cards'][index]),
+                  borderRadius: Constants.defaultBorderRadius,
                 ),
                 child: Image(
                   image: NetworkImage(

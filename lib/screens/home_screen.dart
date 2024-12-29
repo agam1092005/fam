@@ -26,7 +26,7 @@ class HomeScreen extends StatelessWidget {
       body: cardProvider.cardGroups.isEmpty
           ? Center(child: CircularProgressIndicator())
           : RefreshIndicator(
-              color: Color(0xFFBB7E08),
+              color: Colors.orange,
               child: ListView.builder(
                 scrollDirection: Axis.vertical,
                 padding: Constants.defaultPadding,
