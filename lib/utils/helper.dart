@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_displaymode/flutter_displaymode.dart';
 
 Future<double> getImageHeight(String url, double desiredWidth) async {
   final image = NetworkImage(url);
@@ -24,3 +26,9 @@ Future<double> getImageHeight(String url, double desiredWidth) async {
 
   return calculatedHeight;
 }
+
+void setHighRefreshRate() async {
+  print("object");
+  (Platform.isAndroid) ? await FlutterDisplayMode.setHighRefreshRate() : null;
+}
+

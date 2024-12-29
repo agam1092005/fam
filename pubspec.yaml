@@ -13,9 +13,9 @@ dependencies:
   cupertino_icons: ^1.0.8
   http: ^1.2.2
   provider: ^6.1.2
-  google_fonts: ^6.2.1
   url_launcher: ^6.3.1
   shared_preferences: ^2.3.4
+  flutter_displaymode: ^0.6.0
 
 dev_dependencies:
   flutter_test:

@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:fam/components/card_components.dart';
 import 'package:fam/providers/card_provider.dart';
 import 'package:fam/utils/constants.dart';
@@ -5,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../utils/helper.dart';
 
 class DynamicContainer extends StatefulWidget {
