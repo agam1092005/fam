@@ -26,6 +26,7 @@ class HomeScreen extends StatelessWidget {
       body: cardProvider.cardGroups.isEmpty
           ? Center(child: CircularProgressIndicator())
           : RefreshIndicator(
+              color: Color(0xFFBB7E08),
               child: ListView.builder(
                 scrollDirection: Axis.vertical,
                 padding: Constants.defaultPadding,
@@ -39,7 +40,9 @@ class HomeScreen extends StatelessWidget {
                   );
                 },
               ),
-              onRefresh: () async {},
+              onRefresh: () async {
+                await CardProvider().fetchCardData();
+              },
             ),
     );
   }

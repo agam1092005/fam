@@ -5,6 +5,7 @@ class ApiService {
   static const String apiUrl = 'https://polyjuice.kong.fampay.co/mock/famapp/feed/home_section/?slugs=famx-paypage';
 
   static Future fetchGroups() async {
+    print("refreshed");
     final response = await http.get(Uri.parse(apiUrl));
 
     if (response.statusCode == 200) {
