@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../utils/constants.dart';
 
@@ -24,8 +25,7 @@ getLeadingIcon(Map<String, dynamic> card) {
 getTrailingArrow(Map<String, dynamic> card) {
   return Icon(
     Icons.arrow_forward_ios,
-    size:
-    (card.containsKey("icon_size"))
+    size: (card.containsKey("icon_size"))
         ? double.parse(card['icon_size'].toString())
         : 35,
   );
@@ -34,19 +34,18 @@ getTrailingArrow(Map<String, dynamic> card) {
 getBgImage(Map<String, dynamic> card) {
   return (card.containsKey('bg_image'))
       ? Positioned.fill(
-    child: ClipRRect(
-      borderRadius: Constants.defaultBorderRadius,
-      child: Image.network(
-        card['bg_image']
-        ['image_url'],
-        fit: BoxFit.cover,
-        alignment: Alignment.topLeft,
-      ),
-    ),
-  )
+          child: ClipRRect(
+            borderRadius: Constants.defaultBorderRadius,
+            child: Image.network(
+              card['bg_image']['image_url'],
+              fit: BoxFit.cover,
+              alignment: Alignment.topLeft,
+            ),
+          ),
+        )
       : SizedBox(
-    height: 0,
-  );
+          height: 0,
+        );
 }
 
 EdgeInsets? getMargin(Map<String, dynamic> card) {
@@ -65,15 +64,11 @@ double? getSmallCardWidth(Map<String, dynamic> json, Size size) {
       : ((size.width - 64) / json['cards'].length);
 }
 
-
 Gradient getCardGradient(Map<String, dynamic> card) {
   return LinearGradient(
-    colors: (card['bg_gradient']
-    ['colors'] as List)
-        .map((hex) {
+    colors: (card['bg_gradient']['colors'] as List).map((hex) {
       if (hex is String) {
-        final colorValue =
-        int.parse(hex.substring(1), radix: 16);
+        final colorValue = int.parse(hex.substring(1), radix: 16);
         return Color(0xFF000000 | colorValue);
       } else {
         throw FormatException(
@@ -84,9 +79,43 @@ Gradient getCardGradient(Map<String, dynamic> card) {
     end: Alignment(1.0, 0.0),
     transform: GradientRotation(
       double.parse(
-        card['bg_gradient']['angle']
-            .toString(),
+        card['bg_gradient']['angle'].toString(),
       ),
     ),
+  );
+}
+
+
+getCta(Map<String, dynamic> card) {
+  return (card.containsKey('cta'))
+      ? Wrap(
+    spacing: 8,
+    children: [
+      for (var cta in card['cta'])
+        TextButton(
+          onPressed: () async {
+            (cta.containsKey('url'))
+                ? await launchUrl(
+              Uri.parse(
+                cta['url'],
+              ),
+            )
+                : null;
+          },
+          style: TextButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius:
+              BorderRadius.circular(
+                  8), // Adjust the radius as needed
+            ),
+            backgroundColor: Color(int.parse(
+                "0xFF${cta['bg_color'].toString().substring(1)}")),
+          ),
+          child: Text(cta['text']),
+        )
+    ],
+  )
+      : SizedBox(
+    height: 0,
   );
 }

@@ -161,30 +161,7 @@ class _DynamicContainerState extends State<DynamicContainer> {
                                 SizedBox(
                                   height: 20,
                                 ),
-                                (widget.json['cards'][index].containsKey('cta'))
-                                    ? TextButton(
-                                        onPressed: () async {
-                                          await launchUrl(
-                                            Uri.parse(
-                                              widget.json['cards'][index]
-                                                  ['url'],
-                                            ),
-                                          );
-                                        },
-                                        style: TextButton.styleFrom(
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                                8), // Adjust the radius as needed
-                                          ),
-                                          backgroundColor: Color(int.parse(
-                                              "0xFF${widget.json['cards'][index]['cta'][0]['bg_color'].toString().substring(1)}")),
-                                        ),
-                                        child: Text(widget.json['cards'][index]
-                                            ['cta'][0]['text']),
-                                      )
-                                    : SizedBox(
-                                        height: 0,
-                                      ),
+                                getCta(widget.json['cards'][index]),
                               ],
                             ),
                           ),
@@ -228,6 +205,7 @@ class _DynamicContainerState extends State<DynamicContainer> {
                       children: [
                         getBgImage(widget.json['cards'][index]),
                         Text(widget.json['cards'][index]['title'] ?? ''),
+                        getCta(widget.json['cards'][index]),
                       ],
                     ),
                   );
