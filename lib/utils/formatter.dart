@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Formatter {
   static TextSpan formatText(String template, List<dynamic> entities) {
@@ -30,25 +31,33 @@ class Formatter {
       FontWeight? fontWeight = fontWeights[entityMap['font_family']];
 
       // Add the rich text for the entity
-      spans.add(TextSpan(
-        text: entityMap['text'],
-        style: TextStyle(
-          color: entityMap['color'] != null
-              ? Color(int.parse('0xFF${entityMap['color'].substring(1)}'))
+      spans.add(
+        TextSpan(
+          text: entityMap['text'],
+          style: TextStyle(
+            color: entityMap['color'] != null
+                ? Color(int.parse('0xFF${entityMap['color'].substring(1)}'))
+                : null,
+            fontSize: entityMap['font_size']?.toDouble(),
+            fontWeight: fontWeight,
+            fontStyle:
+                entityMap['font_style'] == 'italic' ? FontStyle.italic : null,
+            decoration: entityMap['font_style'] == 'underline'
+                ? TextDecoration.underline
+                : null,
+          ),
+          recognizer: entityMap['url'] != null
+              ? (TapGestureRecognizer()
+                ..onTap = () async {
+                  await launchUrl(
+                    Uri.parse(
+                      entityMap['url'],
+                    ),
+                  );
+                })
               : null,
-          fontSize: entityMap['font_size']?.toDouble(),
-          fontWeight: fontWeight,
-          fontStyle: entityMap['font_style'] == 'italic' ? FontStyle.italic : null,
-          decoration: entityMap['font_style'] == 'underline' ? TextDecoration.underline : null,
         ),
-        recognizer: entityMap['url'] != null
-            ? (TapGestureRecognizer()
-          ..onTap = () {
-            // Handle URL clicks
-            print('Open URL: ${entityMap['url']}');
-          })
-            : null,
-      ));
+      );
 
       lastIndex = placeholderIndex + 2; // Move past the placeholder
     }

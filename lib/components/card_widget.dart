@@ -1,6 +1,10 @@
 import 'package:fam/components/card_components.dart';
+import 'package:fam/providers/card_provider.dart';
 import 'package:fam/utils/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../utils/helper.dart';
 
 class DynamicContainer extends StatefulWidget {
@@ -37,9 +41,8 @@ class _DynamicContainerState extends State<DynamicContainer> {
                   alignment: Alignment.center,
                   child: ListTile(
                     leading: getLeadingIcon(widget.json['cards'][index]),
-                    title:  getTitle(widget.json['cards'][index]),
-                    subtitle:
-                    getDesc(widget.json['cards'][index]),
+                    title: getTitle(widget.json['cards'][index]),
+                    subtitle: getDesc(widget.json['cards'][index]),
                   ),
                 ),
               );
@@ -61,6 +64,7 @@ class _DynamicContainerState extends State<DynamicContainer> {
                   setState(() {
                     _isSlidingMap[index] = true;
                   });
+                  HapticFeedback.heavyImpact();
                 },
                 onTap: () {
                   setState(() {
@@ -86,11 +90,14 @@ class _DynamicContainerState extends State<DynamicContainer> {
                           children: [
                             GestureDetector(
                               onTap: () {
-                                // Handle "Remind Later" action
-                                print('Remind Later Pressed');
+                                Provider.of<CardProvider>(context,
+                                        listen: false)
+                                    .removeItem(
+                                        "${widget.json['id']}-${widget.json['cards'][index]['id']}");
                                 setState(() {
                                   _isSlidingMap[index] = false;
                                 });
+                                HapticFeedback.selectionClick();
                               },
                               child: Container(
                                 padding: Constants.defaultPadding,
@@ -108,12 +115,22 @@ class _DynamicContainerState extends State<DynamicContainer> {
                               ),
                             ),
                             GestureDetector(
-                              onTap: () {
-                                // Handle "Dismiss Now" action
-                                print('Dismiss Now Pressed');
+                              onTap: () async {
+                                final SharedPreferences prefs =
+                                    await SharedPreferences.getInstance();
+                                List<String> items =
+                                    prefs.getStringList('items') ?? [];
+                                items.add(
+                                    "${widget.json['id']}-${widget.json['cards'][index]['id']}");
+                                await prefs.setStringList('items', items);
+                                Provider.of<CardProvider>(context,
+                                        listen: false)
+                                    .removeItem(
+                                        "${widget.json['id']}-${widget.json['cards'][index]['id']}");
                                 setState(() {
                                   _isSlidingMap[index] = false;
                                 });
+                                HapticFeedback.selectionClick();
                               },
                               child: Container(
                                 padding: Constants.defaultPadding,
@@ -155,17 +172,22 @@ class _DynamicContainerState extends State<DynamicContainer> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Expanded(child: SizedBox(
-                                  height: MediaQuery.of(context).size.height * 0.1,
-                                ),),
+                                Expanded(
+                                  child: SizedBox(
+                                    height: MediaQuery.of(context).size.height *
+                                        0.1,
+                                  ),
+                                ),
                                 getTitle(widget.json['cards'][index]),
                                 getDesc(widget.json['cards'][index]),
                                 SizedBox(
-                                  height: MediaQuery.of(context).size.height * 0.05,
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.05,
                                 ),
                                 getCta(widget.json['cards'][index]),
                                 SizedBox(
-                                  height: MediaQuery.of(context).size.height * 0.025,
+                                  height: MediaQuery.of(context).size.height *
+                                      0.025,
                                 ),
                               ],
                             ),
@@ -242,9 +264,8 @@ class _DynamicContainerState extends State<DynamicContainer> {
                   child: ListTile(
                     trailing: getTrailingArrow(widget.json['cards'][index]),
                     leading: getLeadingIcon(widget.json['cards'][index]),
-                    title:  getTitle(widget.json['cards'][index]),
-                    subtitle:
-                        getDesc(widget.json['cards'][index]),
+                    title: getTitle(widget.json['cards'][index]),
+                    subtitle: getDesc(widget.json['cards'][index]),
                   ),
                 ),
               );
