@@ -33,7 +33,8 @@ getTrailingArrow(Map<String, dynamic> card) {
 }
 
 getBgImage(Map<String, dynamic> card) {
-  return (card.containsKey('bg_image'))
+  return (card.containsKey('bg_image') &&
+          card['bg_image']['image_type'] == "ext")
       ? Positioned.fill(
           child: ClipRRect(
             borderRadius: Constants.defaultBorderRadius,
@@ -107,10 +108,20 @@ getCta(Map<String, dynamic> card) {
                     borderRadius:
                         BorderRadius.circular(8), // Adjust the radius as needed
                   ),
-                  backgroundColor: Color(int.parse(
-                      "0xFF${cta['bg_color'].toString().substring(1)}")),
+                  backgroundColor: (cta.containsKey("bg_color"))
+                      ? Color(int.parse(
+                          "0xFF${cta['bg_color'].toString().substring(1)}"))
+                      : null,
                 ),
-                child: Text(cta['text']),
+                child: Text(
+                  cta['text'],
+                  style: TextStyle(
+                    color: (cta.containsKey("text_color"))
+                        ? Color(int.parse(
+                            "0xFF${cta['text_color'].toString().substring(1)}"))
+                        : null,
+                  ),
+                ),
               )
           ],
         )
@@ -134,12 +145,12 @@ getTitle(Map<String, dynamic> card) {
 getDesc(Map<String, dynamic> card) {
   return (card.containsKey("formatted_description"))
       ? RichText(
-    text: Formatter.formatText(
-      card['formatted_description']['text'],
-      card['formatted_description']['entities'],
-    ),
-    textAlign: getTextAlign(card['formatted_description']['align']),
-  )
+          text: Formatter.formatText(
+            card['formatted_description']['text'],
+            card['formatted_description']['entities'],
+          ),
+          textAlign: getTextAlign(card['formatted_description']['align']),
+        )
       : Text(card['description'] ?? '');
 }
 
@@ -156,4 +167,14 @@ TextAlign getTextAlign(String align) {
     default:
       return TextAlign.start;
   }
+}
+
+launchCardUrl(Map<String, dynamic> card) async {
+  return (card.containsKey("url"))
+      ? await launchUrl(
+          Uri.parse(
+            card['url'],
+          ),
+        )
+      : null;
 }

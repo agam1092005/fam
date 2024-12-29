@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../utils/helper.dart';
 
 class DynamicContainer extends StatefulWidget {
@@ -29,20 +30,25 @@ class _DynamicContainerState extends State<DynamicContainer> {
             scrollDirection: Axis.horizontal,
             physics: getScrollable(widget.json),
             itemBuilder: (BuildContext context, int index) {
-              return Container(
-                width:
-                    getSmallCardWidth(widget.json, MediaQuery.of(context).size),
-                margin: getMargin(widget.json['cards'][index]),
-                decoration: BoxDecoration(
-                  color: getBackgroundColor(widget.json['cards'][index]),
-                  borderRadius: Constants.defaultBorderRadius,
-                ),
-                child: Align(
-                  alignment: Alignment.center,
-                  child: ListTile(
-                    leading: getLeadingIcon(widget.json['cards'][index]),
-                    title: getTitle(widget.json['cards'][index]),
-                    subtitle: getDesc(widget.json['cards'][index]),
+              return GestureDetector(
+                onTap: () async {
+                  await launchCardUrl(widget.json['cards'][index]);
+                },
+                child: Container(
+                  width: getSmallCardWidth(
+                      widget.json, MediaQuery.of(context).size),
+                  margin: getMargin(widget.json['cards'][index]),
+                  decoration: BoxDecoration(
+                    color: getBackgroundColor(widget.json['cards'][index]),
+                    borderRadius: Constants.defaultBorderRadius,
+                  ),
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: ListTile(
+                      leading: getLeadingIcon(widget.json['cards'][index]),
+                      title: getTitle(widget.json['cards'][index]),
+                      subtitle: getDesc(widget.json['cards'][index]),
+                    ),
                   ),
                 ),
               );
@@ -62,14 +68,12 @@ class _DynamicContainerState extends State<DynamicContainer> {
               return GestureDetector(
                 onLongPress: () {
                   setState(() {
-                    _isSlidingMap[index] = true;
+                    _isSlidingMap[index] = !_isSlidingMap[index]!;
                   });
                   HapticFeedback.heavyImpact();
                 },
-                onTap: () {
-                  setState(() {
-                    _isSlidingMap[index] = false;
-                  });
+                onTap: () async {
+                  await launchCardUrl(widget.json['cards'][index]);
                 },
                 child: Stack(
                   children: [
@@ -211,7 +215,7 @@ class _DynamicContainerState extends State<DynamicContainer> {
               return CircularProgressIndicator();
             }
 
-            double h = snapshot.data ?? 100;
+            double h = snapshot.data ?? 200;
             return SizedBox(
               height: h,
               width: double.maxFinite,
@@ -220,21 +224,26 @@ class _DynamicContainerState extends State<DynamicContainer> {
                 scrollDirection: Axis.horizontal,
                 physics: getScrollable(widget.json),
                 itemBuilder: (BuildContext context, int index) {
-                  return Container(
-                    margin: getMargin(widget.json['cards'][index]),
-                    width: MediaQuery.of(context).size.width - 48,
-                    decoration: BoxDecoration(
-                      color: getBackgroundColor(widget.json['cards'][index]),
-                      borderRadius: Constants.defaultBorderRadius,
-                    ),
-                    child: Stack(
-                      alignment: Alignment.topLeft,
-                      children: [
-                        getBgImage(widget.json['cards'][index]),
-                        getTitle(widget.json['cards'][index]),
-                        getDesc(widget.json['cards'][index]),
-                        getCta(widget.json['cards'][index]),
-                      ],
+                  return GestureDetector(
+                    onTap: () async {
+                      await launchCardUrl(widget.json['cards'][index]);
+                    },
+                    child: Container(
+                      margin: getMargin(widget.json['cards'][index]),
+                      width: MediaQuery.of(context).size.width - 48,
+                      decoration: BoxDecoration(
+                        color: getBackgroundColor(widget.json['cards'][index]),
+                        borderRadius: Constants.defaultBorderRadius,
+                      ),
+                      child: Stack(
+                        alignment: Alignment.topLeft,
+                        children: [
+                          getBgImage(widget.json['cards'][index]),
+                          getTitle(widget.json['cards'][index]),
+                          getDesc(widget.json['cards'][index]),
+                          getCta(widget.json['cards'][index]),
+                        ],
+                      ),
                     ),
                   );
                 },
@@ -251,21 +260,26 @@ class _DynamicContainerState extends State<DynamicContainer> {
             scrollDirection: Axis.horizontal,
             physics: getScrollable(widget.json),
             itemBuilder: (BuildContext context, int index) {
-              return Container(
-                width:
-                    getSmallCardWidth(widget.json, MediaQuery.of(context).size),
-                margin: getMargin(widget.json['cards'][index]),
-                decoration: BoxDecoration(
-                  color: getBackgroundColor(widget.json['cards'][index]),
-                  borderRadius: Constants.defaultBorderRadius,
-                ),
-                child: Align(
-                  alignment: Alignment.center,
-                  child: ListTile(
-                    trailing: getTrailingArrow(widget.json['cards'][index]),
-                    leading: getLeadingIcon(widget.json['cards'][index]),
-                    title: getTitle(widget.json['cards'][index]),
-                    subtitle: getDesc(widget.json['cards'][index]),
+              return GestureDetector(
+                onTap: () async {
+                  await launchCardUrl(widget.json['cards'][index]);
+                },
+                child: Container(
+                  width: getSmallCardWidth(
+                      widget.json, MediaQuery.of(context).size),
+                  margin: getMargin(widget.json['cards'][index]),
+                  decoration: BoxDecoration(
+                    color: getBackgroundColor(widget.json['cards'][index]),
+                    borderRadius: Constants.defaultBorderRadius,
+                  ),
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: ListTile(
+                      trailing: getTrailingArrow(widget.json['cards'][index]),
+                      leading: getLeadingIcon(widget.json['cards'][index]),
+                      title: getTitle(widget.json['cards'][index]),
+                      subtitle: getDesc(widget.json['cards'][index]),
+                    ),
                   ),
                 ),
               );
@@ -279,16 +293,27 @@ class _DynamicContainerState extends State<DynamicContainer> {
             itemCount: widget.json['cards'].length,
             scrollDirection: Axis.horizontal,
             itemBuilder: (BuildContext context, int index) {
-              return Container(
-                margin: EdgeInsets.symmetric(horizontal: 8),
-                decoration: BoxDecoration(
-                  gradient: getCardGradient(widget.json['cards'][index]),
-                  borderRadius: Constants.defaultBorderRadius,
-                ),
-                child: Image(
-                  image: NetworkImage(
-                    widget.json['cards'][index]['bg_image']['image_url'],
+              return GestureDetector(
+                onTap: () async {
+                  await launchCardUrl(widget.json['cards'][index]);
+                },
+                child: Container(
+                  margin: EdgeInsets.symmetric(horizontal: 8),
+                  decoration: BoxDecoration(
+                    gradient: getCardGradient(widget.json['cards'][index]),
+                    borderRadius: Constants.defaultBorderRadius,
                   ),
+                  child: (widget.json['cards'][index].containsKey('bg_image') &&
+                          widget.json['cards'][index]['bg_image']
+                                  ['image_type'] ==
+                              "ext")
+                      ? Image(
+                          image: NetworkImage(
+                            widget.json['cards'][index]['bg_image']
+                                ['image_url'],
+                          ),
+                        )
+                      : null,
                 ),
               );
             },

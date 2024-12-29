@@ -11,10 +11,8 @@ class ApiService {
     final response = await http.get(Uri.parse(apiUrl));
 
     if (response.statusCode == 200) {
-      // Decode the response as a list
       final List<dynamic> data = json.decode(response.body);
 
-      // Map each JSON object to a CardGroupModel
       return data[0]['hc_groups'];
     } else {
       throw Exception('Failed to load card groups');

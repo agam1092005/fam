@@ -24,7 +24,9 @@ class HomeScreen extends StatelessWidget {
         ),
       ),
       body: cardProvider.cardGroups.isEmpty
-          ? Center(child: CircularProgressIndicator())
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
           : RefreshIndicator(
               color: Colors.orange,
               child: ListView.builder(
