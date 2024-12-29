@@ -1,7 +1,6 @@
 import 'package:fam/components/card_components.dart';
 import 'package:fam/utils/constants.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../utils/helper.dart';
 
 class DynamicContainer extends StatefulWidget {
@@ -38,9 +37,9 @@ class _DynamicContainerState extends State<DynamicContainer> {
                   alignment: Alignment.center,
                   child: ListTile(
                     leading: getLeadingIcon(widget.json['cards'][index]),
-                    title: Text(widget.json['cards'][index]['title'] ?? ''),
+                    title:  getTitle(widget.json['cards'][index]),
                     subtitle:
-                        Text(widget.json['cards'][index]['description'] ?? ''),
+                    getDesc(widget.json['cards'][index]),
                   ),
                 ),
               );
@@ -151,17 +150,23 @@ class _DynamicContainerState extends State<DynamicContainer> {
                         children: [
                           getBgImage(widget.json['cards'][index]),
                           Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 40),
+                            padding: EdgeInsets.symmetric(horizontal: 48),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text(
-                                    widget.json['cards'][index]['title'] ?? ''),
+                                Expanded(child: SizedBox(
+                                  height: MediaQuery.of(context).size.height * 0.1,
+                                ),),
+                                getTitle(widget.json['cards'][index]),
+                                getDesc(widget.json['cards'][index]),
                                 SizedBox(
-                                  height: 20,
+                                  height: MediaQuery.of(context).size.height * 0.05,
                                 ),
                                 getCta(widget.json['cards'][index]),
+                                SizedBox(
+                                  height: MediaQuery.of(context).size.height * 0.025,
+                                ),
                               ],
                             ),
                           ),
@@ -204,7 +209,8 @@ class _DynamicContainerState extends State<DynamicContainer> {
                       alignment: Alignment.topLeft,
                       children: [
                         getBgImage(widget.json['cards'][index]),
-                        Text(widget.json['cards'][index]['title'] ?? ''),
+                        getTitle(widget.json['cards'][index]),
+                        getDesc(widget.json['cards'][index]),
                         getCta(widget.json['cards'][index]),
                       ],
                     ),
@@ -236,9 +242,9 @@ class _DynamicContainerState extends State<DynamicContainer> {
                   child: ListTile(
                     trailing: getTrailingArrow(widget.json['cards'][index]),
                     leading: getLeadingIcon(widget.json['cards'][index]),
-                    title: Text(widget.json['cards'][index]['title'] ?? ''),
+                    title:  getTitle(widget.json['cards'][index]),
                     subtitle:
-                        Text(widget.json['cards'][index]['description'] ?? ''),
+                        getDesc(widget.json['cards'][index]),
                   ),
                 ),
               );

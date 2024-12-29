@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../utils/constants.dart';
+import '../utils/formatter.dart';
 
 Color getBackgroundColor(Map<String, dynamic> card) {
   return card.containsKey("bg_color")
@@ -85,37 +86,74 @@ Gradient getCardGradient(Map<String, dynamic> card) {
   );
 }
 
-
 getCta(Map<String, dynamic> card) {
   return (card.containsKey('cta'))
       ? Wrap(
-    spacing: 8,
-    children: [
-      for (var cta in card['cta'])
-        TextButton(
-          onPressed: () async {
-            (cta.containsKey('url'))
-                ? await launchUrl(
-              Uri.parse(
-                cta['url'],
-              ),
-            )
-                : null;
-          },
-          style: TextButton.styleFrom(
-            shape: RoundedRectangleBorder(
-              borderRadius:
-              BorderRadius.circular(
-                  8), // Adjust the radius as needed
-            ),
-            backgroundColor: Color(int.parse(
-                "0xFF${cta['bg_color'].toString().substring(1)}")),
-          ),
-          child: Text(cta['text']),
+          spacing: 8,
+          children: [
+            for (var cta in card['cta'])
+              TextButton(
+                onPressed: () async {
+                  (cta.containsKey('url'))
+                      ? await launchUrl(
+                          Uri.parse(
+                            cta['url'],
+                          ),
+                        )
+                      : null;
+                },
+                style: TextButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius:
+                        BorderRadius.circular(8), // Adjust the radius as needed
+                  ),
+                  backgroundColor: Color(int.parse(
+                      "0xFF${cta['bg_color'].toString().substring(1)}")),
+                ),
+                child: Text(cta['text']),
+              )
+          ],
         )
-    ],
-  )
       : SizedBox(
-    height: 0,
-  );
+          height: 0,
+        );
+}
+
+getTitle(Map<String, dynamic> card) {
+  return (card.containsKey("formatted_title"))
+      ? RichText(
+          text: Formatter.formatText(
+            card['formatted_title']['text'],
+            card['formatted_title']['entities'],
+          ),
+          textAlign: getTextAlign(card['formatted_title']['align']),
+        )
+      : Text(card['title'] ?? '');
+}
+
+getDesc(Map<String, dynamic> card) {
+  return (card.containsKey("formatted_description"))
+      ? RichText(
+    text: Formatter.formatText(
+      card['formatted_description']['text'],
+      card['formatted_description']['entities'],
+    ),
+    textAlign: getTextAlign(card['formatted_description']['align']),
+  )
+      : Text(card['description'] ?? '');
+}
+
+TextAlign getTextAlign(String align) {
+  switch (align) {
+    case 'left':
+      return TextAlign.left;
+    case 'center':
+      return TextAlign.center;
+    case 'right':
+      return TextAlign.right;
+    case 'justify':
+      return TextAlign.justify;
+    default:
+      return TextAlign.start;
+  }
 }
