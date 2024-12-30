@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
 
+// Calculates image height based on its width and aspect ratio.
 Future<double> getImageHeight(String url, double desiredWidth) async {
   final image = NetworkImage(url);
   final completer = Completer<ImageInfo>();
@@ -27,8 +27,8 @@ Future<double> getImageHeight(String url, double desiredWidth) async {
   return calculatedHeight;
 }
 
+// Sets the screen to high refresh rate on Android.
 void setHighRefreshRate() async {
-  print("object");
   (Platform.isAndroid) ? await FlutterDisplayMode.setHighRefreshRate() : null;
 }
 
